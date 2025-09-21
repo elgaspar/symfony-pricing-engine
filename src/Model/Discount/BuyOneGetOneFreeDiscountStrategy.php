@@ -13,7 +13,7 @@ readonly class BuyOneGetOneFreeDiscountStrategy implements DiscountStrategyInter
         $basePrice = $item->getProduct()->getBasePrice()->toInt();
 
         return new Price(
-            $basePrice * ceil($quantity / 2)
+            $basePrice * ((int) ceil($quantity / 2))
         );
     }
 

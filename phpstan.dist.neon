@@ -1,0 +1,20 @@
+parameters:
+    level: 6
+    paths:
+        - bin/
+        - config/
+        - public/
+        - src/
+        - tests/
+    ignoreErrors:
+        - '#Method .* return type has no value type specified in iterable type array#'
+        - '#Method .* has parameter .* with no value type specified in iterable type array#'
+        - '#Call to function .* with .* will always evaluate to true#'
+        -
+            message: '#Property .* is never written, only read#'
+            paths:
+                - %currentWorkingDirectory%/src/Entity/ProductEntity.php
+        -
+            message: '#Property .* type has no value type specified in iterable type array#'
+            paths:
+                - %currentWorkingDirectory%/src/Entity/ProductEntity.php

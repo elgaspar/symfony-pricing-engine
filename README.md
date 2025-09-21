@@ -8,6 +8,7 @@ It is designed to highlight clean code structure, extensibility, and clear probl
 ## Tools
 
 ```bash
-php vendor/bin/phpcs
-php vendor/bin/phpcbf
+composer phpcs
+composer phpcbf
+composer phpstan
 ```

@@ -23,7 +23,7 @@ class ProductMapper
             throw new \InvalidArgumentException('Invalid data type');
         }
 
-        if (isset($data['id']) && !is_int($data['id']) && $data['id'] !== null) {
+        if (isset($data['id']) && !is_int($data['id'])) {
             throw new \InvalidArgumentException('Invalid id type');
         }
 
