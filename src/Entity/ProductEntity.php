@@ -2,12 +2,11 @@
 
 namespace App\Entity;
 
-use App\Repository\ProductRepository;
 use Doctrine\ORM\Mapping as ORM;
 
-#[ORM\Entity(repositoryClass: ProductRepository::class)]
+#[ORM\Entity]
 #[ORM\Table(name: "product")]
-class ProductEntity implements \JsonSerializable
+class ProductEntity
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
@@ -62,15 +61,5 @@ class ProductEntity implements \JsonSerializable
         $this->discountStrategy = $discountStrategy;
 
         return $this;
-    }
-
-    public function jsonSerialize(): array
-    {
-        return [
-            'id' => $this->getId(),
-            'name' => $this->getName(),
-            'basePrice' => $this->getBasePrice(),
-            'discountStrategy' => $this->getDiscountStrategy(),
-        ];
     }
 }
