@@ -144,7 +144,7 @@ class CartFactoryTest extends TestCase
         $cart = $factory->fromArray($array);
 
         $cartItems = [];
-        foreach($cart as $item) {
+        foreach ($cart as $item) {
             $cartItems[] = $item;
         }
 
@@ -173,7 +173,7 @@ class CartFactoryTest extends TestCase
         $cart = $factory->fromArray($array);
 
         $cartItems = [];
-        foreach($cart as $item) {
+        foreach ($cart as $item) {
             $cartItems[] = $item;
         }
 
@@ -212,7 +212,7 @@ class CartFactoryTest extends TestCase
         $cart = $factory->fromArray($array);
 
         $cartItems = [];
-        foreach($cart as $item) {
+        foreach ($cart as $item) {
             $cartItems[] = $item;
         }
 

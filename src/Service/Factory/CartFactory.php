@@ -21,7 +21,11 @@ class CartFactory
 
         $cartItems = [];
         foreach ($values['items'] as $item) {
-            if (!isset($item['productId'], $item['quantity']) || !is_numeric($item['productId']) || !is_numeric($item['quantity'])) {
+            if (
+                !isset($item['productId'], $item['quantity']) ||
+                !is_numeric($item['productId']) ||
+                !is_numeric($item['quantity'])
+            ) {
                 throw new \InvalidArgumentException('Invalid cart item data');
             }
 

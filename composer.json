@@ -69,8 +69,9 @@
         }
     },
     "require-dev": {
-        "roave/security-advisories": "dev-latest",
         "phpunit/phpunit": "^12.3",
+        "roave/security-advisories": "dev-latest",
+        "squizlabs/php_codesniffer": "^4.0",
         "symfony/browser-kit": "7.3.*",
         "symfony/css-selector": "7.3.*",
         "symfony/maker-bundle": "^1.64"

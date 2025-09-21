@@ -2,7 +2,6 @@
 
 namespace App\Model\Cart;
 
-
 use App\Model\Product;
 
 readonly class CartItem

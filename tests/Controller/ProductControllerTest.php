@@ -239,5 +239,4 @@ final class ProductControllerTest extends WebTestCase
 
         $repository->delete($product->getId());
     }
-
 }
