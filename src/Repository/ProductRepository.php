@@ -2,42 +2,87 @@
 
 namespace App\Repository;
 
-use App\Entity\Product;
-use Doctrine\Bundle\DoctrineBundle\Repository\ServiceEntityRepository;
-use Doctrine\Persistence\ManagerRegistry;
+use App\Entity\ProductEntity;
+use App\Model\Product;
+use App\Service\Mapper\ProductMapper;
+use Doctrine\ORM\EntityManagerInterface;
+use Doctrine\ORM\EntityRepository;
+use InvalidArgumentException;
 
-/**
- * @extends ServiceEntityRepository<Product>
- */
-class ProductRepository extends ServiceEntityRepository
+class ProductRepository
 {
-    public function __construct(ManagerRegistry $registry)
+    private EntityRepository $entityRepository;
+
+    public function __construct(private EntityManagerInterface $entityManager, private ProductMapper $mapper)
     {
-        parent::__construct($registry, Product::class);
+        $this->entityRepository = $entityManager->getRepository(ProductEntity::class);
     }
 
-    //    /**
-    //     * @return Product[] Returns an array of Product objects
-    //     */
-    //    public function findByExampleField($value): array
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->orderBy('p.id', 'ASC')
-    //            ->setMaxResults(10)
-    //            ->getQuery()
-    //            ->getResult()
-    //        ;
-    //    }
+    public function findAll(): array
+    {
+        $entities = $this->entityRepository->findAll();
 
-    //    public function findOneBySomeField($value): ?Product
-    //    {
-    //        return $this->createQueryBuilder('p')
-    //            ->andWhere('p.exampleField = :val')
-    //            ->setParameter('val', $value)
-    //            ->getQuery()
-    //            ->getOneOrNullResult()
-    //        ;
-    //    }
+        $products = [];
+        foreach ($entities as $entity) {
+            $products[] = $this->mapper->entityToModel($entity);
+        }
+
+        return $products;
+    }
+
+    public function find(int $id): ?Product
+    {
+        $entity = $this->entityRepository->find($id);
+
+        if ($entity === null) {
+            return null;
+        }
+
+        return $this->mapper->entityToModel($entity);
+    }
+
+    public function create(Product $product): Product
+    {
+        $entity = $this->mapper->modelToEntity($product);
+
+        $this->entityManager->persist($entity);
+        $this->entityManager->flush();
+
+        return $this->mapper->entityToModel($entity);
+    }
+
+    public function update(Product $product): Product
+    {
+        if (!$product->hasId()) {
+            throw new InvalidArgumentException('Product ID is required for update');
+        }
+
+        $existingEntity = $this->entityRepository->find($product->getId());
+
+        if ($existingEntity === null) {
+            throw new InvalidArgumentException('Product does not exist');
+        }
+
+        $entity = $this->mapper->modelToEntity($product, $existingEntity);
+        $this->entityManager->flush();
+
+        return $this->mapper->entityToModel($entity);
+    }
+
+    public function delete(int $id): void
+    {
+        $existingEntity = $this->entityRepository->find($id);
+
+        if ($existingEntity === null) {
+            throw new InvalidArgumentException('Product does not exist');
+        }
+
+        $this->entityManager->remove($existingEntity);
+        $this->entityManager->flush();
+    }
+
+    public function exists(int $id): bool
+    {
+        return $this->entityRepository->count(['id' => $id]) > 0;
+    }
 }
