@@ -33,7 +33,7 @@ class FixedDiscountStrategyTest extends TestCase
     #[TestWith([1, 90])]
     #[TestWith([2, 180])]
     #[TestWith([3, 270])]
-    public function testApplyWhenOneProduct(int $quantity, int $expectedFinalPrice): void
+    public function testApply(int $quantity, int $expectedFinalPrice): void
     {
         $discountStrategy = new FixedDiscountStrategy(10);
 

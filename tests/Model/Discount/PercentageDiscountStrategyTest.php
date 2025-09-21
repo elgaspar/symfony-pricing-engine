@@ -35,7 +35,7 @@ class PercentageDiscountStrategyTest extends TestCase
     #[TestWith([1, 80])]
     #[TestWith([2, 160])]
     #[TestWith([3, 240])]
-    public function testApplyWhenOneProduct(int $quantity, int $expectedFinalPrice): void
+    public function testApply(int $quantity, int $expectedFinalPrice): void
     {
         $discountStrategy = new PercentageDiscountStrategy(20);
 

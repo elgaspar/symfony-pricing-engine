@@ -15,7 +15,7 @@ class NoDiscountStrategyTest extends TestCase
     #[TestWith([1, 100])]
     #[TestWith([2, 200])]
     #[TestWith([3, 300])]
-    public function testApplyWhenOneProduct(int $quantity, int $expectedFinalPrice): void
+    public function testApply(int $quantity, int $expectedFinalPrice): void
     {
         $discountStrategy = new NoDiscountStrategy();
 

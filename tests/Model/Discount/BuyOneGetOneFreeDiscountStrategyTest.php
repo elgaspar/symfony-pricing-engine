@@ -17,7 +17,7 @@ class BuyOneGetOneFreeDiscountStrategyTest extends TestCase
     #[TestWith([3, 200])]
     #[TestWith([4, 200])]
     #[TestWith([5, 300])]
-    public function testApplyWhenOneProduct(int $quantity, int $expectedFinalPrice): void
+    public function testApply(int $quantity, int $expectedFinalPrice): void
     {
         $discountStrategy = new BuyOneGetOneFreeDiscountStrategy();
 
