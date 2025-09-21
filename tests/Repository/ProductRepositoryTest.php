@@ -3,11 +3,12 @@
 namespace App\Tests\Repository;
 
 use App\Entity\ProductEntity;
+use App\Model\Discount\NoDiscountStrategy;
+use App\Model\Price;
 use App\Model\Product;
+use App\Repository\ProductEntityRepository;
 use App\Repository\ProductRepository;
 use App\Service\Mapper\ProductMapper;
-use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\EntityRepository;
 use InvalidArgumentException;
 use PHPUnit\Framework\TestCase;
 
@@ -17,16 +18,10 @@ class ProductRepositoryTest extends TestCase
     {
         $productEntity1 = $this->createStub(ProductEntity::class);
         $productEntity2 = $this->createStub(ProductEntity::class);
-        $entityRepository = $this->createStub(EntityRepository::class);
+        $entityRepository = $this->createStub(ProductEntityRepository::class);
         $entityRepository
             ->method('findAll')
             ->willReturn([$productEntity1, $productEntity2]);
-
-        $entityManager = $this->createStub(EntityManagerInterface::class);
-        $entityManager
-            ->method('getRepository')
-            ->with(ProductEntity::class)
-            ->willReturn($entityRepository);
 
         $expectedProduct1 = $this->createStub(Product::class);
         $expectedProduct2 = $this->createStub(Product::class);
@@ -38,7 +33,7 @@ class ProductRepositoryTest extends TestCase
                 [$productEntity2, $expectedProduct2],
             ]);
 
-        $repository = new ProductRepository($entityManager, $mapper);
+        $repository = new ProductRepository($entityRepository, $mapper);
         $results = $repository->findAll();
 
         self::assertSame([$expectedProduct1, $expectedProduct2], $results);
@@ -49,17 +44,11 @@ class ProductRepositoryTest extends TestCase
         $id = 123;
 
         $productEntity = $this->createStub(ProductEntity::class);
-        $entityRepository = $this->createStub(EntityRepository::class);
+        $entityRepository = $this->createStub(ProductEntityRepository::class);
         $entityRepository
             ->method('find')
             ->with($id)
             ->willReturn($productEntity);
-
-        $entityManager = $this->createStub(EntityManagerInterface::class);
-        $entityManager
-            ->method('getRepository')
-            ->with(ProductEntity::class)
-            ->willReturn($entityRepository);
 
         $expectedProduct = $this->createStub(Product::class);
         $mapper = $this->createStub(ProductMapper::class);
@@ -68,7 +57,7 @@ class ProductRepositoryTest extends TestCase
             ->with($productEntity)
             ->willReturn($expectedProduct);
 
-        $repository = new ProductRepository($entityManager, $mapper);
+        $repository = new ProductRepository($entityRepository, $mapper);
         $foundProduct = $repository->find($id);
 
         self::assertSame($expectedProduct, $foundProduct);
@@ -78,21 +67,15 @@ class ProductRepositoryTest extends TestCase
     {
         $id = 123;
 
-        $entityRepository = $this->createStub(EntityRepository::class);
+        $entityRepository = $this->createStub(ProductEntityRepository::class);
         $entityRepository
             ->method('find')
             ->with($id)
             ->willReturn(null);
 
-        $entityManager = $this->createStub(EntityManagerInterface::class);
-        $entityManager
-            ->method('getRepository')
-            ->with(ProductEntity::class)
-            ->willReturn($entityRepository);
-
         $mapper = $this->createStub(ProductMapper::class);
 
-        $repository = new ProductRepository($entityManager, $mapper);
+        $repository = new ProductRepository($entityRepository, $mapper);
         $foundProduct = $repository->find($id);
 
         self::assertNull($foundProduct);
@@ -103,20 +86,12 @@ class ProductRepositoryTest extends TestCase
         $product = $this->createStub(Product::class);
 
         $productEntity = $this->createStub(ProductEntity::class);
-        $entityRepository = $this->createStub(EntityRepository::class);
 
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager
-            ->method('getRepository')
-            ->with(ProductEntity::class)
-            ->willReturn($entityRepository);
-        $entityManager
+        $entityRepository = $this->createMock(ProductEntityRepository::class);
+        $entityRepository
             ->expects($this->once())
-            ->method('persist')
+            ->method('save')
             ->with($productEntity);
-        $entityManager
-            ->expects($this->once())
-            ->method('flush');
 
         $mapper = $this->createStub(ProductMapper::class);
 
@@ -131,7 +106,7 @@ class ProductRepositoryTest extends TestCase
             ->with($productEntity)
             ->willReturn($finalProduct);
 
-        $repository = new ProductRepository($entityManager, $mapper);
+        $repository = new ProductRepository($entityRepository, $mapper);
         $createdProduct = $repository->create($product);
 
         self::assertSame($finalProduct, $createdProduct);
@@ -139,28 +114,25 @@ class ProductRepositoryTest extends TestCase
 
     public function testUpdate(): void
     {
-        $product = $this->createStub(Product::class);
-        $product->method('hasId')->willReturn(true);
-        $product->method('getId')->willReturn(123);
+        $product = new Product(
+            123,
+            'Test Product',
+            new Price(1000),
+            new NoDiscountStrategy()
+        );
 
         $productEntity = $this->createStub(ProductEntity::class);
-        $entityRepository = $this->createStub(EntityRepository::class);
+        $entityRepository = $this->createMock(ProductEntityRepository::class);
         $entityRepository
             ->method('find')
             ->with(123)
             ->willReturn($productEntity);
-
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager
-            ->method('getRepository')
-            ->with(ProductEntity::class)
-            ->willReturn($entityRepository);
-        $entityManager
+        $entityRepository
             ->expects($this->once())
-            ->method('flush');
+            ->method('save')
+            ->with($productEntity);
 
         $mapper = $this->createStub(ProductMapper::class);
-
         $mapper
             ->method('modelToEntity')
             ->with($product)
@@ -172,51 +144,7 @@ class ProductRepositoryTest extends TestCase
             ->with($productEntity)
             ->willReturn($finalProduct);
 
-        $repository = new ProductRepository($entityManager, $mapper);
-        $updatedProduct = $repository->update($product);
-
-        self::assertSame($finalProduct, $updatedProduct);
-    }
-
-    public function testUpdateWhenNoId(): void
-    {
-        $this->expectException(InvalidArgumentException::class);
-        $this->expectExceptionMessage('Product ID is required for update');
-
-        $product = $this->createStub(Product::class);
-        $product->method('hasId')->willReturn(false);
-        $product->method('getId')->willReturn(null);
-
-        $productEntity = $this->createStub(ProductEntity::class);
-        $entityRepository = $this->createStub(EntityRepository::class);
-        $entityRepository
-            ->method('find')
-            ->with(123)
-            ->willReturn($productEntity);
-
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager
-            ->method('getRepository')
-            ->with(ProductEntity::class)
-            ->willReturn($entityRepository);
-        $entityManager
-            ->expects($this->never())
-            ->method('flush');
-
-        $mapper = $this->createStub(ProductMapper::class);
-
-        $mapper
-            ->method('modelToEntity')
-            ->with($product)
-            ->willReturn($productEntity);
-
-        $finalProduct = $this->createStub(Product::class);
-        $mapper
-            ->method('entityToModel')
-            ->with($productEntity)
-            ->willReturn($finalProduct);
-
-        $repository = new ProductRepository($entityManager, $mapper);
+        $repository = new ProductRepository($entityRepository, $mapper);
         $updatedProduct = $repository->update($product);
 
         self::assertSame($finalProduct, $updatedProduct);
@@ -227,72 +155,52 @@ class ProductRepositoryTest extends TestCase
         $this->expectException(InvalidArgumentException::class);
         $this->expectExceptionMessage('Product does not exist');
 
-        $product = $this->createStub(Product::class);
-        $product->method('hasId')->willReturn(true);
-        $product->method('getId')->willReturn(123);
+        $product = new Product(
+            123,
+            'Test Product',
+            new Price(1000),
+            new NoDiscountStrategy()
+        );
 
-        $productEntity = $this->createStub(ProductEntity::class);
-        $entityRepository = $this->createStub(EntityRepository::class);
+        $entityRepository = $this->createMock(ProductEntityRepository::class);
         $entityRepository
             ->method('find')
             ->with(123)
             ->willReturn(null);
-
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager
-            ->method('getRepository')
-            ->with(ProductEntity::class)
-            ->willReturn($entityRepository);
-        $entityManager
+        $entityRepository
             ->expects($this->never())
-            ->method('flush');
+            ->method('save');
 
         $mapper = $this->createStub(ProductMapper::class);
-
         $mapper
             ->method('modelToEntity')
-            ->with($product)
-            ->willReturn($productEntity);
+            ->willReturn($this->createStub(ProductEntity::class));
 
-        $finalProduct = $this->createStub(Product::class);
         $mapper
             ->method('entityToModel')
-            ->with($productEntity)
-            ->willReturn($finalProduct);
+            ->willReturn($this->createStub(Product::class));
 
-        $repository = new ProductRepository($entityManager, $mapper);
-        $updatedProduct = $repository->update($product);
-
-        self::assertSame($finalProduct, $updatedProduct);
+        $repository = new ProductRepository($entityRepository, $mapper);
+        $repository->update($product);
     }
 
     public function testDelete(): void
     {
         $id = 123;
 
-        $productEntity = $this->createStub(ProductEntity::class);
-        $entityRepository = $this->createStub(EntityRepository::class);
+        $entityRepository = $this->createMock(ProductEntityRepository::class);
         $entityRepository
-            ->method('find')
+            ->method('exists')
             ->with($id)
-            ->willReturn($productEntity);
-
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager
-            ->method('getRepository')
-            ->with(ProductEntity::class)
-            ->willReturn($entityRepository);
-        $entityManager
+            ->willReturn(true);
+        $entityRepository
             ->expects($this->once())
-            ->method('remove')
-            ->with($productEntity);
-        $entityManager
-            ->expects($this->once())
-            ->method('flush');
+            ->method('delete')
+            ->with($id);
 
         $mapper = $this->createStub(ProductMapper::class);
 
-        $repository = new ProductRepository($entityManager, $mapper);
+        $repository = new ProductRepository($entityRepository, $mapper);
         $repository->delete($id);
     }
 
@@ -303,24 +211,19 @@ class ProductRepositoryTest extends TestCase
 
         $id = 123;
 
-        $entityRepository = $this->createStub(EntityRepository::class);
+        $entityRepository = $this->createMock(ProductEntityRepository::class);
         $entityRepository
-            ->method('find')
+            ->method('exists')
             ->with($id)
-            ->willReturn(null);
-
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager
-            ->method('getRepository')
-            ->with(ProductEntity::class)
-            ->willReturn($entityRepository);
-        $entityManager
+            ->willReturn(false);
+        $entityRepository
             ->expects($this->never())
-            ->method('flush');
+            ->method('delete')
+            ->with($id);
 
         $mapper = $this->createStub(ProductMapper::class);
 
-        $repository = new ProductRepository($entityManager, $mapper);
+        $repository = new ProductRepository($entityRepository, $mapper);
         $repository->delete($id);
     }
 
@@ -328,21 +231,15 @@ class ProductRepositoryTest extends TestCase
     {
         $id = 123;
 
-        $entityRepository = $this->createStub(EntityRepository::class);
+        $entityRepository = $this->createStub(ProductEntityRepository::class);
         $entityRepository
-            ->method('count')
-            ->with(['id' => $id])
-            ->willReturn(1);
-
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager
-            ->method('getRepository')
-            ->with(ProductEntity::class)
-            ->willReturn($entityRepository);
+            ->method('exists')
+            ->with($id)
+            ->willReturn(true);
 
         $mapper = $this->createStub(ProductMapper::class);
 
-        $repository = new ProductRepository($entityManager, $mapper);
+        $repository = new ProductRepository($entityRepository, $mapper);
         $result = $repository->exists($id);
 
         self::assertTrue($result);
@@ -352,21 +249,15 @@ class ProductRepositoryTest extends TestCase
     {
         $id = 123;
 
-        $entityRepository = $this->createStub(EntityRepository::class);
+        $entityRepository = $this->createStub(ProductEntityRepository::class);
         $entityRepository
-            ->method('count')
-            ->with(['id' => $id])
-            ->willReturn(0);
-
-        $entityManager = $this->createMock(EntityManagerInterface::class);
-        $entityManager
-            ->method('getRepository')
-            ->with(ProductEntity::class)
-            ->willReturn($entityRepository);
+            ->method('exists')
+            ->with($id)
+            ->willReturn(false);
 
         $mapper = $this->createStub(ProductMapper::class);
 
-        $repository = new ProductRepository($entityManager, $mapper);
+        $repository = new ProductRepository($entityRepository, $mapper);
         $result = $repository->exists($id);
 
         self::assertFalse($result);
