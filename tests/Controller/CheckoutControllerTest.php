@@ -21,7 +21,7 @@ class CheckoutControllerTest extends WebTestCase
         $product1 = $repository->create(new Product(null, 'Apple', new Price(100), new NoDiscountStrategy()));
         $product2 = $repository->create(new Product(null, 'Peach', new Price(200), new FixedDiscountStrategy(20)));
 
-        $client->request('POST', '/checkout', [], [], [], json_encode([
+        $client->request('POST', '/api/v1/checkout', [], [], [], json_encode([
             'items' => [
                 [
                     'productId' => $product1->getId(),
@@ -48,7 +48,7 @@ class CheckoutControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('POST', '/checkout', [], [], [], json_encode([
+        $client->request('POST', '/api/v1/checkout', [], [], [], json_encode([
             'items' => [
                 [
                     'productId' => 'invalid id',
@@ -65,7 +65,7 @@ class CheckoutControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('POST', '/checkout', [], [], [], json_encode([
+        $client->request('POST', '/api/v1/checkout', [], [], [], json_encode([
             'items' => [
                 [
                     'productId' => '99999',

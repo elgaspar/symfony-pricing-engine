@@ -1,0 +1,382 @@
+openapi: 3.0.4
+info:
+    title: Pricing Engine API
+    description: A simple pricing engine with discount strategies
+    version: 1.0.0
+    contact:
+        name: Elias Gasparis
+servers:
+    - url: http://localhost:8000/api/v1
+      description: Local development server
+paths:
+    /products:
+        get:
+            tags:
+                - Products
+            summary: List all products
+            description: Retrieve a list of all available products
+            responses:
+                '200':
+                    description: Successful response
+                    content:
+                        application/json:
+                            schema:
+                                type: array
+                                items:
+                                    $ref: '#/components/schemas/Product'
+                            example:
+                                - id: 1
+                                  name: "Gaming Mouse"
+                                  basePrice: 4999
+                                  discountStrategy:
+                                      type: "percentage"
+                                      value: 20
+                                - id: 2
+                                  name: "Mechanical Keyboard"
+                                  basePrice: 12999
+                                  discountStrategy:
+                                      type: "buyOneGetOneFree"
+                '500':
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/InternalServerErrorResponse'
+        post:
+            tags:
+                - Products
+            summary: Create a new product
+            description: Add a new product to the catalog
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ProductInput'
+                        example:
+                            name: "Gaming Mouse"
+                            basePrice: 4999
+                            discountStrategy:
+                                type: "percentage"
+                                value: 20
+            responses:
+                '201':
+                    description: Product created successfully
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Product'
+                '400':
+                    description: Invalid input data
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/BadRequestResponse'
+                '500':
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/InternalServerErrorResponse'
+    /products/{id}:
+        get:
+            tags:
+                - Products
+            summary: Get product by ID
+            description: Retrieve a specific product by its ID
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+                      example: 1
+            responses:
+                '200':
+                    description: Product found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Product'
+                '404':
+                    description: Product not found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/NotFoundResponse'
+                '500':
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/InternalServerErrorResponse'
+        put:
+            tags:
+                - Products
+            summary: Update product
+            description: Replace an existing product with new data
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/ProductInput'
+            responses:
+                '200':
+                    description: Product updated successfully
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/Product'
+                '404':
+                    description: Product not found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/NotFoundResponse'
+                '500':
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/InternalServerErrorResponse'
+        delete:
+            tags:
+                - Products
+            summary: Delete product
+            description: Remove a product from the catalog
+            parameters:
+                - name: id
+                  in: path
+                  required: true
+                  schema:
+                      type: integer
+            responses:
+                '204':
+                    description: Product deleted successfully
+                '404':
+                    description: Product not found
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/NotFoundResponse'
+                '500':
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/InternalServerErrorResponse'
+    /checkout:
+        post:
+            tags:
+                - Checkout
+            summary: Calculate cart total
+            description: Calculate the total price of a cart with applied discount strategies
+            requestBody:
+                required: true
+                content:
+                    application/json:
+                        schema:
+                            $ref: '#/components/schemas/CheckoutRequest'
+                        examples:
+                            simple_cart:
+                                summary: Simple cart example
+                                value:
+                                    items:
+                                        - productId: 37
+                                          quantity: 5
+                                        - productId: 35
+                                          quantity: 2
+            responses:
+                '200':
+                    description: Checkout calculation successful
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/CheckoutResponse'
+                            example:
+                                finalPrice: 4454
+                '400':
+                    description: Invalid cart data
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/NotFoundResponse'
+                '500':
+                    description: Internal server error
+                    content:
+                        application/json:
+                            schema:
+                                $ref: '#/components/schemas/InternalServerErrorResponse'
+components:
+    schemas:
+        Product:
+            type: object
+            required:
+                - id
+                - name
+                - basePrice
+                - discountStrategy
+            properties:
+                id:
+                    type: integer
+                    description: Unique product identifier
+                    minimum: 1
+                    example: 13
+                name:
+                    type: string
+                    description: Product name
+                    minLength: 1
+                    maxLength: 255
+                    example: "Gaming Mouse"
+                basePrice:
+                    type: integer
+                    description: Base price in cents before any discounts
+                    minimum: 0
+                    example: 4999
+                discountStrategy:
+                    $ref: '#/components/schemas/DiscountStrategy'
+
+        ProductInput:
+            type: object
+            required:
+                - name
+                - basePrice
+                - discountStrategy
+            properties:
+                name:
+                    type: string
+                    description: Product name (leading and trailing whitespaces will be trimmed)
+                    minLength: 1
+                    maxLength: 255
+                    example: "Gaming Mouse"
+                basePrice:
+                    type: integer
+                    description: Base price in cents before any discounts
+                    minimum: 0
+                    example: 4999
+                discountStrategy:
+                    $ref: '#/components/schemas/DiscountStrategy'
+
+        DiscountStrategy:
+            type: object
+            required:
+                - type
+            properties:
+                type:
+                    type: string
+                    description: Type of discount strategy
+                    enum:
+                        - none
+                        - percentage
+                        - fixed
+                        - buyOneGetOneFree
+                    example: "percentage"
+                value:
+                    type: number
+                    description: Discount value (used for percentage and fixed strategies)
+                    nullable: true
+                    example: 20
+            oneOf:
+                - properties:
+                      type:
+                          enum: ["percentage"]
+                      value:
+                          type: number
+                          minimum: 1
+                          maximum: 100
+                  required:
+                      - type
+                      - value
+                - properties:
+                      type:
+                          enum: ["fixed"]
+                      value:
+                          type: number
+                          minimum: 1
+                  required:
+                      - type
+                      - value
+                - properties:
+                      type:
+                          enum: ["none"]
+                      value:
+                          nullable: true
+                  required:
+                      - type
+                - properties:
+                      type:
+                          enum: ["buyOneGetOneFree"]
+                      value:
+                          nullable: true
+                  required:
+                      - type
+
+        CheckoutRequest:
+            type: object
+            required:
+                - items
+            properties:
+                items:
+                    type: array
+                    description: List of items in the cart
+                    items:
+                        $ref: '#/components/schemas/CartItem'
+
+        CartItem:
+            type: object
+            required:
+                - productId
+                - quantity
+            properties:
+                productId:
+                    type: integer
+                    description: ID of the product
+                    minimum: 1
+                    example: 37
+                quantity:
+                    type: integer
+                    description: Quantity of the product
+                    minimum: 1
+                    example: 5
+
+        CheckoutResponse:
+            type: object
+            required:
+                - finalPrice
+            properties:
+                finalPrice:
+                    type: integer
+                    description: Final total price in cents after all discounts
+                    minimum: 0
+                    example: 4454
+
+        NotFoundResponse:
+            type: object
+            properties:
+                error:
+                    type: string
+                    description: Error message
+                    example: "Not Found"
+
+        BadRequestResponse:
+            type: object
+            properties:
+                error:
+                    type: string
+                    description: Error message
+                    example: "Missing data"
+
+        InternalServerErrorResponse:
+            type: object
+            properties:
+                error:
+                    type: string
+                    description: Error message
+                    example: "Internal server error"

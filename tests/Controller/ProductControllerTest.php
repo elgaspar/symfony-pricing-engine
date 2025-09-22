@@ -22,7 +22,7 @@ final class ProductControllerTest extends WebTestCase
         $product2 = $repository->create(new Product(null, 'Peach', new Price(200), new FixedDiscountStrategy(20)));
 
 
-        $client->request('GET', '/products');
+        $client->request('GET', '/api/v1/products');
 
         self::assertResponseIsSuccessful();
         self::assertResponseHeaderSame('Content-Type', 'application/json');
@@ -55,7 +55,7 @@ final class ProductControllerTest extends WebTestCase
     public function testListWhenNoProducts(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/products');
+        $client->request('GET', '/api/v1/products');
 
         self::assertResponseIsSuccessful();
         self::assertResponseHeaderSame('Content-Type', 'application/json');
@@ -74,7 +74,7 @@ final class ProductControllerTest extends WebTestCase
         $repository = $container->get(ProductRepository::class);
         $product = $repository->create(new Product(null, 'Apple', new Price(100), new FixedDiscountStrategy(22)));
 
-        $client->request('GET', '/products/' . $product->getId());
+        $client->request('GET', '/api/v1/products/' . $product->getId());
 
         self::assertResponseIsSuccessful();
         self::assertResponseHeaderSame('Content-Type', 'application/json');
@@ -99,7 +99,7 @@ final class ProductControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('GET', '/products/99999');
+        $client->request('GET', '/api/v1/products/99999');
 
         self::assertResponseStatusCodeSame(404);
         self::assertResponseHeaderSame('Content-Type', 'application/json');
@@ -113,7 +113,7 @@ final class ProductControllerTest extends WebTestCase
         /** @var ProductRepository $repository */
         $repository = $container->get(ProductRepository::class);
 
-        $client->request('POST', '/products', [], [], [], json_encode([
+        $client->request('POST', '/api/v1/products', [], [], [], json_encode([
             'name' => 'Apple',
             'basePrice' => 100,
             'discountStrategy' => [
@@ -149,7 +149,7 @@ final class ProductControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('POST', '/products', [], [], [], json_encode([
+        $client->request('POST', '/api/v1/products', [], [], [], json_encode([
             'name' => ['array instead of string'],
             'basePrice' => 100,
             'discountStrategy' => [
@@ -171,7 +171,7 @@ final class ProductControllerTest extends WebTestCase
         $repository = $container->get(ProductRepository::class);
         $product = $repository->create(new Product(null, 'Apple', new Price(100), new FixedDiscountStrategy(22)));
 
-        $client->request('PUT', '/products/' . $product->getId(), [], [], [], json_encode([
+        $client->request('PUT', '/api/v1/products/' . $product->getId(), [], [], [], json_encode([
             'name' => 'Orange',
             'basePrice' => 100,
             'discountStrategy' => [
@@ -203,7 +203,7 @@ final class ProductControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('PUT', '/products/99999', [], [], [], json_encode([
+        $client->request('PUT', '/api/v1/products/99999', [], [], [], json_encode([
             'name' => 'Orange',
             'basePrice' => 100,
             'discountStrategy' => [
@@ -225,7 +225,7 @@ final class ProductControllerTest extends WebTestCase
         $repository = $container->get(ProductRepository::class);
         $product = $repository->create(new Product(null, 'Apple', new Price(100), new FixedDiscountStrategy(22)));
 
-        $client->request('PUT', '/products/' . $product->getId(), [], [], [], json_encode([
+        $client->request('PUT', '/api/v1/products/' . $product->getId(), [], [], [], json_encode([
             'name' => 'Orange',
             'basePrice' => 'invalid price value',
             'discountStrategy' => [
