@@ -6,8 +6,8 @@
 ![PHP](https://img.shields.io/badge/PHP-8.4+-blue)
 ![License](https://img.shields.io/badge/license-MIT-blue.svg)
 
-A demonstration project showcasing a flexible and extensible pricing engine built with Symfony.  
-It provides a REST API to manage products and a `/checkout` endpoint that calculates the final  
+A demonstration project showcasing a flexible and extensible pricing engine built with Symfony.
+It provides a REST API to manage products and a `/checkout` endpoint that calculates the final
 cart price by applying different discount strategies.
 
 Each product has a base price and can have one of the following discount strategies applied:
@@ -16,7 +16,7 @@ Each product has a base price and can have one of the following discount strateg
 - Percentage Discount
 - Buy One Get One Free
 
-This project highlights clean code, modular design, and clear API structure, making it easy to  
+This project highlights clean code, modular design, and clear API structure, making it easy to
 extend with additional business rules or discount strategies.
 
 ## Requirements
@@ -101,7 +101,7 @@ Full details are available in the `openapi.yaml` file.
 
 ### Postman Collection
 
-Postman collection and environment files are saved in the `postman/` directory.  
+Postman collection and environment files are saved in the `postman/` directory.
 You can import them in Postman to quickly start testing the API.
 
 ## Tests
