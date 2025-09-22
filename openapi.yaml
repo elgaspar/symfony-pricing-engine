@@ -215,6 +215,11 @@ paths:
                             schema:
                                 $ref: '#/components/schemas/InternalServerErrorResponse'
 components:
+    securitySchemes:
+        BearerAuth:
+            type: http
+            scheme: bearer
+            description: "Provide your API token as a Bearer token, e.g., 'Authorization: Bearer <TOKEN>'"
     schemas:
         Product:
             type: object
@@ -380,3 +385,6 @@ components:
                     type: string
                     description: Error message
                     example: "Internal server error"
+
+security:
+    - BearerAuth: []

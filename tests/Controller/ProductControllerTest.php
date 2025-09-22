@@ -23,6 +23,13 @@ final class ProductControllerTest extends WebTestCase
 
 
         $client->request('GET', '/api/v1/products');
+        $client->request(
+            'GET',
+            '/api/v1/products',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer dummy-token-for-tests']
+        );
 
         self::assertResponseIsSuccessful();
         self::assertResponseHeaderSame('Content-Type', 'application/json');
@@ -57,7 +64,13 @@ final class ProductControllerTest extends WebTestCase
     public function testListWhenNoProducts(): void
     {
         $client = static::createClient();
-        $client->request('GET', '/api/v1/products');
+        $client->request(
+            'GET',
+            '/api/v1/products',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer dummy-token-for-tests']
+        );
 
         self::assertResponseIsSuccessful();
         self::assertResponseHeaderSame('Content-Type', 'application/json');
@@ -76,7 +89,13 @@ final class ProductControllerTest extends WebTestCase
         $repository = $container->get(ProductRepository::class);
         $product = $repository->create(new Product(null, 'Apple', new Price(100), new FixedDiscountStrategy(22)));
 
-        $client->request('GET', '/api/v1/products/' . $product->getId());
+        $client->request(
+            'GET',
+            '/api/v1/products/' . $product->getId(),
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer dummy-token-for-tests']
+        );
 
         self::assertResponseIsSuccessful();
         self::assertResponseHeaderSame('Content-Type', 'application/json');
@@ -101,7 +120,13 @@ final class ProductControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('GET', '/api/v1/products/99999');
+        $client->request(
+            'GET',
+            '/api/v1/products/99999',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer dummy-token-for-tests']
+        );
 
         self::assertResponseStatusCodeSame(404);
         self::assertResponseHeaderSame('Content-Type', 'application/json');
@@ -115,14 +140,21 @@ final class ProductControllerTest extends WebTestCase
         /** @var ProductRepository $repository */
         $repository = $container->get(ProductRepository::class);
 
-        $client->request('POST', '/api/v1/products', [], [], [], json_encode([
-            'name' => 'Apple',
-            'basePrice' => 100,
-            'discountStrategy' => [
-                'type' => 'fixed',
-                'value' => 22,
-            ],
-        ], JSON_THROW_ON_ERROR));
+        $client->request(
+            'POST',
+            '/api/v1/products',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer dummy-token-for-tests'],
+            json_encode([
+                'name' => 'Apple',
+                'basePrice' => 100,
+                'discountStrategy' => [
+                    'type' => 'fixed',
+                    'value' => 22,
+                ],
+            ], JSON_THROW_ON_ERROR)
+        );
 
         self::assertResponseStatusCodeSame(201);
         self::assertResponseHeaderSame('Content-Type', 'application/json');
@@ -151,14 +183,21 @@ final class ProductControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('POST', '/api/v1/products', [], [], [], json_encode([
-            'name' => ['array instead of string'],
-            'basePrice' => 100,
-            'discountStrategy' => [
-                'type' => 'fixed',
-                'value' => 22,
-            ],
-        ], JSON_THROW_ON_ERROR));
+        $client->request(
+            'POST',
+            '/api/v1/products',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer dummy-token-for-tests'],
+            json_encode([
+                'name' => ['array instead of string'],
+                'basePrice' => 100,
+                'discountStrategy' => [
+                    'type' => 'fixed',
+                    'value' => 22,
+                ],
+            ], JSON_THROW_ON_ERROR)
+        );
 
         self::assertResponseStatusCodeSame(400);
         self::assertResponseHeaderSame('Content-Type', 'application/json');
@@ -173,14 +212,21 @@ final class ProductControllerTest extends WebTestCase
         $repository = $container->get(ProductRepository::class);
         $product = $repository->create(new Product(null, 'Apple', new Price(100), new FixedDiscountStrategy(22)));
 
-        $client->request('PUT', '/api/v1/products/' . $product->getId(), [], [], [], json_encode([
-            'name' => 'Orange',
-            'basePrice' => 100,
-            'discountStrategy' => [
-                'type' => 'fixed',
-                'value' => 22,
-            ],
-        ], JSON_THROW_ON_ERROR));
+        $client->request(
+            'PUT',
+            '/api/v1/products/' . $product->getId(),
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer dummy-token-for-tests'],
+            json_encode([
+                'name' => 'Orange',
+                'basePrice' => 100,
+                'discountStrategy' => [
+                    'type' => 'fixed',
+                    'value' => 22,
+                ],
+            ], JSON_THROW_ON_ERROR)
+        );
 
         self::assertResponseIsSuccessful();
         self::assertResponseHeaderSame('Content-Type', 'application/json');
@@ -205,14 +251,21 @@ final class ProductControllerTest extends WebTestCase
     {
         $client = static::createClient();
 
-        $client->request('PUT', '/api/v1/products/99999', [], [], [], json_encode([
-            'name' => 'Orange',
-            'basePrice' => 100,
-            'discountStrategy' => [
-                'type' => 'fixed',
-                'value' => 22,
-            ],
-        ], JSON_THROW_ON_ERROR));
+        $client->request(
+            'PUT',
+            '/api/v1/products/99999',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer dummy-token-for-tests'],
+            json_encode([
+                'name' => 'Orange',
+                'basePrice' => 100,
+                'discountStrategy' => [
+                    'type' => 'fixed',
+                    'value' => 22,
+                ],
+            ], JSON_THROW_ON_ERROR)
+        );
 
         self::assertResponseStatusCodeSame(404);
         self::assertResponseHeaderSame('Content-Type', 'application/json');
@@ -227,14 +280,21 @@ final class ProductControllerTest extends WebTestCase
         $repository = $container->get(ProductRepository::class);
         $product = $repository->create(new Product(null, 'Apple', new Price(100), new FixedDiscountStrategy(22)));
 
-        $client->request('PUT', '/api/v1/products/' . $product->getId(), [], [], [], json_encode([
-            'name' => 'Orange',
-            'basePrice' => 'invalid price value',
-            'discountStrategy' => [
-                'type' => 'fixed',
-                'value' => 22,
-            ],
-        ], JSON_THROW_ON_ERROR));
+        $client->request(
+            'PUT',
+            '/api/v1/products/' . $product->getId(),
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer dummy-token-for-tests'],
+            json_encode([
+                'name' => 'Orange',
+                'basePrice' => 'invalid price value',
+                'discountStrategy' => [
+                    'type' => 'fixed',
+                    'value' => 22,
+                ],
+            ], JSON_THROW_ON_ERROR)
+        );
 
         self::assertResponseStatusCodeSame(400);
         self::assertResponseHeaderSame('Content-Type', 'application/json');
