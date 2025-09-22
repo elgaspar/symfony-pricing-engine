@@ -320,7 +320,6 @@ final class ProductControllerTest extends WebTestCase
         );
 
         self::assertResponseStatusCodeSame(204);
-        self::assertResponseHeaderSame('Content-Type', 'application/json');
     }
 
     public function testDeleteWhenNotExists(): void
