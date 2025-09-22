@@ -9,7 +9,7 @@ readonly class PercentageDiscountStrategy implements DiscountStrategyInterface
 {
     public function __construct(private int $value)
     {
-        if ($this->value < 0 || $this->value > 100) {
+        if ($this->value < 1 || $this->value > 100) {
             throw new \InvalidArgumentException('Percentage discount value must be between 0 and 100');
         }
     }

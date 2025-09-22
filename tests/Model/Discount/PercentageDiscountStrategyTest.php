@@ -12,7 +12,6 @@ use PHPUnit\Framework\TestCase;
 
 class PercentageDiscountStrategyTest extends TestCase
 {
-    #[TestWith([0])]
     #[TestWith([1])]
     #[TestWith([50])]
     #[TestWith([99])]
@@ -23,6 +22,7 @@ class PercentageDiscountStrategyTest extends TestCase
         $this->expectNotToPerformAssertions();
     }
 
+    #[TestWith([0])]
     #[TestWith([-1])]
     #[TestWith([101])]
     public function testInvalidPercentages(int $value): void
