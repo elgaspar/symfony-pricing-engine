@@ -155,7 +155,7 @@ and better maintainability.
 
 ### Caching
 
-Doctrine is enabled in the production environment to improve performance. A production-ready
+Doctrine cache is enabled in the production environment to improve performance. A production-ready
 system could also leverage HTTP-level caching (e.g., Cache-Control headers) for additional
 performance gains, though it was not implemented in this project.
 
