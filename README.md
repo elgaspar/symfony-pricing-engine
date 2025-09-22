@@ -141,9 +141,8 @@ This project uses GitHub Actions to automatically run tests, static analysis, an
 on every push or pull request.
 
 - The `.github/workflows/tests.yml` workflow runs PHPUnit with Xdebug to collect code coverage, which is uploaded to
-[Codecov](https://codecov.io/) for visualization and badge updates.
+  [Codecov](https://codecov.io/) for visualization and badge updates.
 - The `.github/workflows/static-analysis.yml` workflow runs PHPStan to check for type errors and potential issues.
-
 
 ## Architecture
 
