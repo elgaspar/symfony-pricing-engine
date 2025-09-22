@@ -1,0 +1,17 @@
+name: Static Analysis
+
+on:
+    push:
+        branches: [ main ]
+    pull_request:
+        branches: [ main ]
+
+jobs:
+    phpstan:
+        runs-on: ubuntu-latest
+        steps:
+            - uses: actions/checkout@v3
+            - name: Install dependencies
+              run: composer install --no-interaction --no-progress
+            - name: Run PHPStan
+              run: composer phpstan
