@@ -1,5 +1,11 @@
 # Symfony Pricing Engine
 
+![Tests](https://github.com/elgaspar/symfony-pricing-engine/actions/workflows/tests.yml/badge.svg)
+[![codecov](https://codecov.io/github/elgaspar/symfony-pricing-engine/graph/badge.svg?token=TUNZU56A2F)](https://codecov.io/github/elgaspar/symfony-pricing-engine)
+![PHPStan](https://github.com/elgaspar/symfony-pricing-engine/actions/workflows/static-analysis.yml/badge.svg)
+![PHP](https://img.shields.io/badge/PHP-8.4+-blue)
+![License](https://img.shields.io/badge/license-MIT-blue.svg)
+
 A demonstration project showcasing a flexible and extensible pricing engine built with Symfony.  
 It provides a REST API to manage products and a `/checkout` endpoint that calculates the final  
 cart price by applying different discount strategies.
