@@ -37,7 +37,7 @@ class NoDiscountStrategyTest extends TestCase
         $discountStrategy = new NoDiscountStrategy();
 
         self::assertEquals(
-            [],
+            ['type' => 'none'],
             $discountStrategy->toArray()
         );
     }

@@ -34,6 +34,18 @@ class DiscountStrategyFactoryTest extends TestCase
         $factory->fromArray($array);
     }
 
+    public function testFromArrayWhenNone(): void
+    {
+        $array = [
+            'type' => 'none'
+        ];
+
+        $factory = new DiscountStrategyFactory();
+        $discountStrategy = $factory->fromArray($array);
+
+        self::assertInstanceOf(NoDiscountStrategy::class, $discountStrategy);
+    }
+
     public function testFromArrayWhenFixed(): void
     {
         $array = [

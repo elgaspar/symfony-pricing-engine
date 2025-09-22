@@ -34,7 +34,9 @@ final class ProductControllerTest extends WebTestCase
                 'id' => $product1->getId(),
                 'name' => 'Apple',
                 'basePrice' => 100,
-                'discountStrategy' => [],
+                'discountStrategy' => [
+                    'type' => 'none'
+                ],
             ],
             [
                 'id' => $product2->getId(),

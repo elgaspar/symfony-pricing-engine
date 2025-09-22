@@ -17,6 +17,8 @@ readonly class NoDiscountStrategy implements DiscountStrategyInterface
 
     public function toArray(): array
     {
-        return [];
+        return [
+            'type' => 'none'
+        ];
     }
 }

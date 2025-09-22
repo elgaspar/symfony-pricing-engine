@@ -20,6 +20,7 @@ class DiscountStrategyFactory
         $type = (string)$data['type'];
 
         return match ($type) {
+            'none' => new NoDiscountStrategy(),
             'fixed' => new FixedDiscountStrategy($data['value'] ?? 0),
             'percentage' => new PercentageDiscountStrategy($data['value'] ?? 0),
             'buyOneGetOneFree' => new BuyOneGetOneFreeDiscountStrategy(),
