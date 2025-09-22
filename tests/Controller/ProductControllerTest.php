@@ -301,4 +301,40 @@ final class ProductControllerTest extends WebTestCase
 
         $repository->delete($product->getId());
     }
+
+    public function testDelete(): void
+    {
+        $client = static::createClient();
+        $container = static::getContainer();
+
+        /** @var ProductRepository $repository */
+        $repository = $container->get(ProductRepository::class);
+        $product = $repository->create(new Product(null, 'Apple', new Price(100), new FixedDiscountStrategy(22)));
+
+        $client->request(
+            'DELETE',
+            '/api/v1/products/' . $product->getId(),
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer dummy-token-for-tests']
+        );
+
+        self::assertResponseStatusCodeSame(204);
+        self::assertResponseHeaderSame('Content-Type', 'application/json');
+    }
+
+    public function testDeleteWhenNotExists(): void
+    {
+        $client = static::createClient();
+
+        $client->request(
+            'DELETE',
+            '/api/v1/products/99999',
+            [],
+            [],
+            ['HTTP_Authorization' => 'Bearer dummy-token-for-tests']
+        );
+
+        self::assertResponseStatusCodeSame(404);
+    }
 }
