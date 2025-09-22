@@ -2,7 +2,7 @@ name: Tests
 
 on:
   push:
-    branches: [ ci-wip ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
 
