@@ -161,7 +161,7 @@ performance gains, though it was not implemented in this project.
 
 ## Author
 
-Elias Gasparis
+[Elias Gasparis](https://github.com/elgaspar)
 
 ## License
 
