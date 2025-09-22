@@ -58,6 +58,8 @@
         "post-update-cmd": [
             "@auto-scripts"
         ],
+        "test": "php bin/phpunit",
+        "test:reset-db": "docker-compose exec database psql -U app -d app_test -c \"TRUNCATE TABLE product;\"",
         "phpcs": "./vendor/bin/phpcs",
         "phpcbf": "./vendor/bin/phpcbf",
         "phpstan": "./vendor/bin/phpstan --memory-limit=1G"
